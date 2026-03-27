@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Afreldo Community | SA-MP Server</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Poppins', monospace;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(125deg, #0a0a0a 0%, #1a0033 100%);
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,0,100,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveGrid 20s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .header {
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid #ff3366;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo h1 {
+            color: #ff3366;
+            font-size: 22px;
+            text-shadow: 0 0 10px rgba(255,51,102,0.5);
+        }
+
+        .logo p {
+            font-size: 10px;
+            color: #888;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            list-style: none;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #ff3366;
+        }
+
+        .login-icon {
+            background: #ff3366;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .login-icon:hover {
+            background: #cc2255;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 24px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 380px;
+            border: 1px solid #ff3366;
+        }
+
+        .modal-content h2 {
+            color: #ff3366;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 22px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #ff3366;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .modal-content button {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+            color: #ff3366;
+        }
+
+        .admin-panel {
+            display: none;
+            background: rgba(0,0,0,0.9);
+            border: 2px solid #ff3366;
+            border-radius: 15px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .admin-panel.show {
+            display: block;
+        }
+
+        .admin-panel h3 {
+            color: #ff3366;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .admin-control {
+            margin: 12px 0;
+            padding: 10px;
+            background: rgba(255,51,102,0.1);
+            border-radius: 8px;
+        }
+
+        .admin-control label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #ff99bb;
+        }
+
+        .admin-control input, .admin-control textarea, .admin-control select {
+            width: 100%;
+            padding: 8px;
+            background: #1a1a1a;
+            border: 1px solid #ff3366;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .admin-control button {
+            margin-top: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            width: auto;
+        }
+
+        .logout-btn {
+            background: #ff3366;
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        .upload-area {
+            display: none;
+            background: rgba(0,0,0,0.7);
+            border: 2px dashed #ff3366;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .upload-area.show {
+            display: block;
+        }
+
+        .post-type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px;
+            border-radius: 10px;
+        }
+
+        .post-type-btn {
+            flex: 1;
+            padding: 8px;
+            background: #2a2a2a;
+            border: 1px solid #ff3366;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .post-type-btn.active {
+            background: #ff3366;
+            color: #000;
+        }
+
+        .upload-file-area, .upload-text-area {
+            display: none;
+        }
+
+        .upload-file-area.show, .upload-text-area.show {
+            display: block;
+        }
+
+        .upload-btn {
+            background: #ff3366;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        #fileInput, #textTitle, #textContent {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            background: #1a1a1a;
+            border: 1px solid #ff3366;
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        #textContent {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .posts-list {
+            margin: 20px 0;
+        }
+
+        .post-card {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #ff3366;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 12px 0;
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #333;
+        }
+
+        .post-type-badge {
+            background: #ff3366;
+            padding: 2px 8px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .post-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff3366;
+            margin: 8px 0;
+            word-break: break-word;
+        }
+
+        .post-content {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #ddd;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .post-meta {
+            font-size: 10px;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        .post-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .download-post, .delete-post {
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 11px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .download-post {
+            background: #00aa44;
+            color: #fff;
+        }
+
+        .delete-post {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        .server-card {
+            background: linear-gradient(135deg, rgba(255,51,102,0.2), rgba(0,0,0,0.8));
+            border: 1px solid #ff3366;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(5px);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #00ff00;
+            color: #000;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .server-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 8px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+
+        .info-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff3366;
+            word-break: break-all;
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .step {
+            background: rgba(255,51,102,0.1);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            border-left: 3px solid #ff3366;
+        }
+
+        .step-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff3366;
+        }
+
+        .ip-box {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 12px;
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ip-address {
+            font-size: 18px;
+            font-family: monospace;
+            color: #ff3366;
+            word-break: break-all;
+            text-align: center;
+        }
+
+        .copy-btn {
+            background: #ff3366;
+            border: none;
+            padding: 8px 16px;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .faq-item {
+            background: rgba(0,0,0,0.5);
+            margin: 10px 0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 14px;
+            background: rgba(255,51,102,0.2);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .faq-answer {
+            padding: 0 14px;
+            max-height: 0;
+            overflow: hidden;
+            transition: 0.3s;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 14px;
+            max-height: 300px;
+        }
+
+        .footer {
+            background: #000;
+            padding: 30px 16px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .footer-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .discord-footer-btn, .blogspot-footer-btn {
+            display: block;
+            padding: 12px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .discord-footer-btn {
+            background: #5865F2;
+            color: #fff;
+        }
+
+        .blogspot-footer-btn {
+            background: #ff8800;
+            color: #fff;
+        }
+
+        button, .btn {
+            background: #ff3366;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .welcome {
+            text-align: center;
+            margin: 20px 0;
+            padding: 24px 16px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 15px;
+        }
+
+        .welcome h2 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: #ff3366;
+            word-break: break-word;
+        }
+
+        .welcome p {
+            font-size: 13px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin: 20px 0 12px;
+        }
+
+        .sync-status {
+            font-size: 10px;
+            color: #888;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                padding: 0 24px;
+            }
+            
+            .server-info {
+                flex-direction: row;
+                justify-content: center;
+            }
+            
+            .info-item {
+                flex: 1;
+            }
+            
+            .steps {
+                flex-direction: row;
+            }
+            
+            .step {
+                flex: 1;
+            }
+            
+            .ip-box {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            
+            .footer-buttons {
+                flex-direction: row;
+                justify-content: center;
+            }
+            
+            .discord-footer-btn, .blogspot-footer-btn {
+                display: inline-block;
+                padding: 12px 30px;
+            }
+            
+            .logo h1 {
+                font-size: 28px;
+            }
+            
+            .welcome h2 {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeLogin()">&times;</span>
+            <h2>🔐 LOGIN</h2>
+            <input type="email" id="loginEmail" placeholder="Email" autocomplete="off">
+            <input type="password" id="loginPassword" placeholder="Password">
+            <button onclick="handleLogin()">LOGIN</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="container">
+            <div class="nav">
+                <div class="logo">
+                    <h1>Afreldo Community</h1>
+                    <p>.Est May 2025</p>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#connect">Connect</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="https://discord.gg/Zb33WNPmDK" target="_blank">Discord</a></li>
+                    <li class="login-icon" onclick="openLogin()">🔐 LOGIN</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Admin Panel -->
+        <div id="adminPanel" class="admin-panel">
+            <h3>⚙️ ADMIN CONTROL PANEL</h3>
+            <div class="admin-control">
+                <label>Server Status</label>
+                <select id="adminStatus">
+                    <option value="online">ONLINE</option>
+                    <option value="offline">OFFLINE</option>
+                </select>
+                <button onclick="updateServerStatus()">Apply</button>
+            </div>
+            <div class="admin-control">
+                <label>Max Players</label>
+                <input type="number" id="adminMaxPlayers" value="30">
+                <button onclick="updateMaxPlayers()">Update</button>
+            </div>
+            <div class="admin-control">
+                <label>Welcome Title</label>
+                <input type="text" id="adminWelcomeTitle" value="WELCOME TO AFRELDO COMMUNITY">
+                <button onclick="updateWelcomeTitle()">Update</button>
+            </div>
+            <div class="admin-control">
+                <label>Welcome Description</label>
+                <textarea id="adminWelcomeDesc" rows="2">Join community bahagia dan ramah anak (katanya)</textarea>
+                <button onclick="updateWelcomeDesc()">Update</button>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 LOGOUT</button>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="welcome" id="welcomeSection">
+            <h2 id="welcomeTitle">WELCOME TO AFRELDO COMMUNITY</h2>
+            <p>Established May 2025</p>
+            <p style="margin-top: 10px; color: #ff3366;" id="welcomeDesc">Join community bahagia dan ramah anak (katanya)</p>
+        </div>
+
+        <!-- Server Status -->
+        <div class="server-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <h2 style="margin:0; font-size:18px;">📡 Server Status</h2>
+                <span class="status-badge" id="serverStatus">● ONLINE</span>
+            </div>
+            <div class="server-info">
+                <div class="info-item">
+                    <div class="info-value" id="serverIP">188.165.192.24:7804</div>
+                    <div>Server Address</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value" id="maxPlayers">30</div>
+                    <div>Max Players</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IP Box -->
+        <div class="ip-box">
+            <span class="ip-address" id="ipText">188.165.192.24:7804</span>
+            <button class="copy-btn" onclick="copyIP()">📋 Copy IP</button>
+        </div>
+
+        <!-- POST UPLOAD AREA (Only visible when logged in) -->
+        <div id="uploadArea" class="upload-area">
+            <h3 style="color:#ff3366; margin-bottom:10px;">📝 BUAT POSTINGAN BARU</h3>
+            
+            <div class="post-type-selector">
+                <div class="post-type-btn active" data-type="file" onclick="setPostType('file')">📁 Upload File</div>
+                <div class="post-type-btn" data-type="text" onclick="setPostType('text')">📝 Tulis Teks</div>
+            </div>
+            
+            <!-- File Upload Area -->
+            <div id="uploadFileArea" class="upload-file-area show">
+                <p style="font-size:13px; margin-bottom:10px;">Drag & drop file atau klik tombol di bawah</p>
+                <div class="upload-btn" onclick="document.getElementById('fileInput').click()">📤 Pilih File</div>
+                <input type="file" id="fileInput" onchange="handleFileUpload(this.files[0])">
+                <div id="uploadStatus" style="margin-top:10px; font-size:12px;"></div>
+            </div>
+            
+            <!-- Text Upload Area -->
+            <div id="uploadTextArea" class="upload-text-area">
+                <input type="text" id="textTitle" placeholder="Judul postingan...">
+                <textarea id="textContent" placeholder="Tulis konten postingan di sini..."></textarea>
+                <div class="upload-btn" onclick="handleTextPost()">📝 Publikasikan Teks</div>
+                <div id="textStatus" style="margin-top:10px; font-size:12px;"></div>
+            </div>
+        </div>
+
+        <!-- POSTS LIST SECTION -->
+        <div id="postsSection" style="margin: 20px 0;">
+            <h2>📢 DROP FILE & INFORMATION</h2>
+            <div id="postsList" class="posts-list">
+                <p style="text-align:center; color:#888;">⏳ Loading postingan...</p>
+            </div>
+            <div class="sync-status" id="syncIndicator">☁️ Cloud sync active</div>
+        </div>
+
+        <!-- How to Connect -->
+        <h2 id="connect">🔧 How to Connect</h2>
+        <div class="steps">
+            <div class="step"><div class="step-number">1</div><h3>Install SA-MP</h3><p>Download SA-MP 0.3.7 atau 0.3DL</p></div>
+            <div class="step"><div class="step-number">2</div><h3>Add Server</h3><p>Klik Add Server, paste: <strong>188.165.192.24:7804</strong></p></div>
+            <div class="step"><div class="step-number">3</div><h3>Jump In</h3><p>Pencet langsung main mantap</p></div>
+        </div>
+
+        <!-- FAQ -->
+        <h2 id="faq">❓ FAQ</h2>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">Is it free to play?</div>
+            <div class="faq-answer">Yes! You just need GTA San Andreas and SA-MP. Server ini gratis selamanya.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">What's the server IP?</div>
+            <div class="faq-answer">188.165.192.24:7804 — Click the IP box to copy it.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">Where can I get help?</div>
+            <div class="faq-answer">Join Discord: <a href="https://discord.gg/Zb33WNPmDK" target="_blank" style="color:#ff3366;">discord.gg/Zb33WNPmDK</a></div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">When was Afreldo Community established?</div>
+            <div class="faq-answer">Afreldo Community was established in May 2025</div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <div class="footer-buttons">
+                <a href="https://discord.gg/Zb33WNPmDK" target="_blank" class="discord-footer-btn">💬 JOIN DISCORD</a>
+                <a href="https://afreldocommunity.blogspot.com/" target="_blank" class="blogspot-footer-btn">📝 MY BLOGSPOT</a>
+            </div>
+            <p>Copyright © Afreldo Community 2026</p>
+            <p>.Est May 2025</p>
+        </div>
+    </div>
+
+    <script>
+        // Login credentials
+        const ADMIN_EMAIL = "robby5pryk@gmail.com";
+        const ADMIN_PASSWORD = "afreldocommunitymay2025";
+        
+        // ============ JSONBIN.IO CLOUD STORAGE ============
+        const JSONBIN_BIN_ID = "69c5f6b0c3097a1dd564fc63";
+        const JSONBIN_API_KEY = "$2a$10$YOUR_API_KEY_HERE"; // GANTI DENGAN API KEY LU
+        const CLOUD_API = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+        
+        let isLoggedIn = false;
+        let currentPostType = 'file';
+        let posts = [];
+        
+        // Load from JSONBin.io Cloud
+        async function loadFromCloud() {
+            try {
+                document.getElementById('postsList').innerHTML = '<p style="text-align:center; color:#888;">⏳ Loading dari cloud...</p>';
+                
+                const response = await fetch(CLOUD_API + "/latest", {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': JSONBIN_API_KEY
+                    }
+                });
+                
+                if(response.ok) {
+                    const data = await response.json();
+                    if(data.record && data.record.posts && Array.isArray(data.record.posts)) {
+                        posts = data.record.posts;
+                        localStorage.setItem('afreldo_posts', JSON.stringify(posts));
+                        renderPostsList();
+                        document.getElementById('syncIndicator').innerHTML = '☁️ Cloud sync active ✓';
+                        document.getElementById('syncIndicator').style.color = '#00ff00';
+                        return true;
+                    }
+                }
+                throw new Error('No cloud data');
+            } catch(e) {
+                console.log('Cloud load failed, using local:', e);
+                const localData = localStorage.getItem('afreldo_posts');
+                if(localData) {
+                    posts = JSON.parse(localData);
+                } else {
+                    posts = [];
+                }
+                renderPostsList();
+                document.getElementById('syncIndicator').innerHTML = '📱 Local mode (cloud unavailable)';
+                document.getElementById('syncIndicator').style.color = '#ffaa00';
+                return false;
+            }
+        }
+        
+        // Save to JSONBin.io Cloud
+        async function saveToCloud() {
+            try {
+                const response = await fetch(CLOUD_API, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_API_KEY
+                    },
+                    body: JSON.stringify({ 
+                        posts: posts,
+                        lastUpdated: new Date().toISOString(),
+                        totalPosts: posts.length
+                    })
+                });
+                
+                if(response.ok) {
+                    document.getElementById('syncIndicator').innerHTML = '☁️ Saved to cloud ✓';
+                    document.getElementById('syncIndicator').style.color = '#00ff00';
+                    setTimeout(() => {
+                        document.getElementById('syncIndicator').innerHTML = '☁️ Cloud sync active';
+                        document.getElementById('syncIndicator').style.color = '#888';
+                    }, 2000);
+                    return true;
+                }
+            } catch(e) {
+                console.log('Save to cloud failed:', e);
+                document.getElementById('syncIndicator').innerHTML = '⚠️ Offline - saved locally';
+                document.getElementById('syncIndicator').style.color = '#ffaa00';
+            }
+            
+            localStorage.setItem('afreldo_posts', JSON.stringify(posts));
+            renderPostsList();
+            return false;
+        }
+        
+        // Save posts (wrapper)
+        async function savePosts() {
+            await saveToCloud();
+        }
+        
+        // Render posts
+        function renderPostsList() {
+            const container = document.getElementById('postsList');
+            if(!container) return;
+            
+            if(posts.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#888;">📢 Belum ada postingan. Login untuk membuat postingan!</p>';
+                return;
+            }
+            
+            container.innerHTML = posts.map((post, index) => `
+                <div class="post-card">
+                    <div class="post-header">
+                        <span class="post-type-badge">${post.type === 'file' ? '📁 FILE' : '📝 TEKS'}</span>
+                        <span class="post-meta">${post.date}</span>
+                    </div>
+                    <div class="post-title">${escapeHtml(post.title)}</div>
+                    ${post.type === 'file' ? `
+                        <div class="post-content">📄 File: ${escapeHtml(post.filename)} (${formatFileSize(post.size)})</div>
+                        <div class="post-actions">
+                            <button class="download-post" onclick="downloadPost(${index})">⬇️ Download File</button>
+                            ${isLoggedIn ? `<button class="delete-post" onclick="deletePost(${index})">🗑️ Hapus</button>` : ''}
+                        </div>
+                    ` : `
+                        <div class="post-content">${escapeHtml(post.content).replace(/\n/g, '<br>')}</div>
+                        <div class="post-actions">
+                            ${isLoggedIn ? `<button class="delete-post" onclick="deletePost(${index})">🗑️ Hapus</button>` : ''}
+                        </div>
+                    `}
+                </div>
+            `).join('');
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatFileSize(bytes) {
+            if(bytes < 1024) return bytes + ' B';
+            if(bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+        
+        function setPostType(type) {
+            currentPostType = type;
+            document.querySelectorAll('.post-type-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.post-type-btn[data-type="${type}"]`).classList.add('active');
+            
+            if(type === 'file') {
+                document.getElementById('uploadFileArea').classList.add('show');
+                document.getElementById('uploadTextArea').classList.remove('show');
+            } else {
+                document.getElementById('uploadFileArea').classList.remove('show');
+                document.getElementById('uploadTextArea').classList.add('show');
+            }
+        }
+        
+        function handleFileUpload(file) {
+            if(!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const newPost = {
+                    id: Date.now(),
+                    type: 'file',
+                    title: file.name,
+                    filename: file.name,
+                    size: file.size,
+                    data: e.target.result,
+                    date: new Date().toLocaleString()
+                };
+                posts.unshift(newPost);
+                await savePosts();
+                document.getElementById('uploadStatus').innerHTML = '✅ File berhasil diupload & tersimpan di cloud!';
+                setTimeout(() => {
+                    document.getElementById('uploadStatus').innerHTML = '';
+                }, 3000);
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        async function handleTextPost() {
+            const title = document.getElementById('textTitle').value.trim();
+            const content = document.getElementById('textContent').value.trim();
+            
+            if(!title) {
+                document.getElementById('textStatus').innerHTML = '❌ Judul tidak boleh kosong!';
+                setTimeout(() => {
+                    document.getElementById('textStatus').innerHTML = '';
+                }, 2000);
+                return;
+            }
+            
+            if(!content) {
+                document.getElementById('textStatus').innerHTML = '❌ Konten tidak boleh kosong!';
+                setTimeout(() => {
+                    document.getElementById('textStatus').innerHTML = '';
+                }, 2000);
+                return;
+            }
+            
+            const newPost = {
+                id: Date.now(),
+                type: 'text',
+                title: title,
+                content: content,
+                date: new Date().toLocaleString()
+            };
+            posts.unshift(newPost);
+            await savePosts();
+            
+            document.getElementById('textTitle').value = '';
+            document.getElementById('textContent').value = '';
+            document.getElementById('textStatus').innerHTML = '✅ Teks berhasil dipublikasikan & tersimpan di cloud!';
+            setTimeout(() => {
+                document.getElementById('textStatus').innerHTML = '';
+            }, 3000);
+        }
+        
+        function downloadPost(index) {
+            const post = posts[index];
+            if(!post || post.type !== 'file' || !post.data) return;
+            
+            const link = document.createElement('a');
+            link.href = post.data;
+            link.download = post.filename;
+            link.click();
+        }
+        
+        async function deletePost(index) {
+            if(!isLoggedIn) {
+                alert('❌ Bukan afreldo');
+                return;
+            }
+            if(confirm('Hapus postingan ini?')) {
+                posts.splice(index, 1);
+                await savePosts();
+                alert('✅ Postingan dihapus dan sync ke cloud!');
+            }
+        }
+        
+        // Drag & drop
+        const uploadFileArea = document.getElementById('uploadFileArea');
+        if(uploadFileArea) {
+            uploadFileArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadFileArea.style.borderColor = '#00ff00';
+            });
+            
+            uploadFileArea.addEventListener('dragleave', () => {
+                uploadFileArea.style.borderColor = '#ff3366';
+            });
+            
+            uploadFileArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadFileArea.style.borderColor = '#ff3366';
+                const file = e.dataTransfer.files[0];
+                if(file) handleFileUpload(file);
+            });
+        }
+        
+        function openLogin() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+
+        function closeLogin() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if(email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                isLoggedIn = true;
+                closeLogin();
+                document.getElementById('adminPanel').classList.add('show');
+                document.getElementById('uploadArea').classList.add('show');
+                renderPostsList();
+                alert('✅ Login berhasil! Kamu bisa upload dan hapus postingan.');
+            } else {
+                alert('❌ Email atau password salah!');
+            }
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            document.getElementById('adminPanel').classList.remove('show');
+            document.getElementById('uploadArea').classList.remove('show');
+            renderPostsList();
+            alert('👋 Logout berhasil');
+        }
+
+        function updateServerStatus() {
+            const status = document.getElementById('adminStatus').value;
+            const statusElement = document.getElementById('serverStatus');
+            if(status === 'online') {
+                statusElement.innerHTML = '● ONLINE';
+                statusElement.style.background = '#00ff00';
+            } else {
+                statusElement.innerHTML = '● OFFLINE';
+                statusElement.style.background = '#ff0000';
+            }
+            alert('✅ Status server diubah menjadi ' + status.toUpperCase());
+        }
+
+        function updateMaxPlayers() {
+            const newMax = document.getElementById('adminMaxPlayers').value;
+            document.getElementById('maxPlayers').innerText = newMax;
+            alert('✅ Max Players diubah menjadi ' + newMax);
+        }
+
+        function updateWelcomeTitle() {
+            const newTitle = document.getElementById('adminWelcomeTitle').value;
+            document.getElementById('welcomeTitle').innerHTML = newTitle;
+            alert('✅ Welcome title diubah');
+        }
+
+        function updateWelcomeDesc() {
+            const newDesc = document.getElementById('adminWelcomeDesc').value;
+            document.getElementById('welcomeDesc').innerHTML = newDesc;
+            alert('✅ Welcome description diubah');
+        }
+
+        function copyIP() {
+            const ip = document.getElementById('ipText').innerText;
+            navigator.clipboard.writeText(ip);
+            alert('✅ IP Copied: ' + ip);
+        }
+
+        function toggleFAQ(element) {
+            const item = element.parentElement;
+            item.classList.toggle('active');
+        }
+
+        function autoStatusCheck() {
+            if(!isLoggedIn) {
+                const statusElement = document.getElementById('serverStatus');
+                const isOnline = Math.random() > 0.05;
+                if(isOnline) {
+                    statusElement.innerHTML = '● ONLINE';
+                    statusElement.style.background = '#00ff00';
+                } else {
+                    statusElement.innerHTML = '● OFFLINE';
+                    statusElement.style.background = '#ff0000';
+                }
+            }
+        }
+
+        setInterval(autoStatusCheck, 60000);
+        
+        // Load data saat halaman dibuka
+        loadFromCloud();
+        
+        console.log('🔥 Afreldo Community | JSONBin Cloud Ready');
+    </script>
+</body>
+</html>
